@@ -75,12 +75,14 @@ D_snames_3 <- unique(c(
 ))
 D_snames_joined <- c(D_snames_1, D_snames_3)
 ######## PERMUTATION STEP ########
-D_snames_1p <- sample(D_snames_joined, length(D_snames_1),replace = T)
-D_snames_3p <- sample(D_snames_joined, length(D_snames_3),replace = T)
+D_snames_1p <- sample(D_snames_joined, length(D_snames_1),replace = F)
+D_snames_3p <- D_snames_joined[! D_snames_joined %in% D_snames_1p]
 
-L_snames_1p <- sample(L_snames_joined, length(L_snames_1),replace = T)
-L_snames_2p <- sample(L_snames_joined, length(L_snames_2),replace=T)
-L_snames_3p <- sample(L_snames_joined, length(L_snames_3),replace=T)
+L_snames_1p <- sample(L_snames_joined, length(L_snames_1),replace = F)
+L_left <- L_snames_joined[L_snames_joined ! %in% L_snames_1p]
+L_snames_2p <- sample(L_left, length(L_snames_joined),replace = F)
+L_snames_3p <- L_left[!L_left %in% L_snames_2p]
+
 
 # Convert new list of names to L_snames_[1:3] and D_snames_[1:2]
 L_snames_1 <- L_snames_1p
