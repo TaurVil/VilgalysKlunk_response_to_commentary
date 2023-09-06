@@ -7,12 +7,12 @@ if (!"MYSITE" %in% info$site) {load("./setup_for_permutations.neut.RData")}
 
 info <- info[info$site %in% "MYSITE",]
 perm_individuals <- function(perm) {
-  # Sample individuals with replacement for each population and time point
-  D_snames_1 <- sample(D_snames_joined, length(D_snames_1), replace = T)
-  D_snames_3 <- sample(D_snames_joined, length(D_snames_3), replace = T)
-  L_snames_1 <- sample(L_snames_joined, length(L_snames_1), replace = T)
-  L_snames_2 <- sample(L_snames_joined, length(L_snames_2), replace = T)
-  L_snames_3 <- sample(L_snames_joined, length(L_snames_3), replace = T)
+  # Sample individuals without replacement for each population and time point
+  D_snames_1 <- sample(D_snames_joined, length(D_snames_1), replace = F)
+  D_snames_3 <- sample(D_snames_joined, length(D_snames_3), replace = F)
+  L_snames_1 <- sample(L_snames_joined, length(L_snames_1), replace = F)
+  L_snames_2 <- sample(L_snames_joined, length(L_snames_2), replace = F)
+  L_snames_3 <- sample(L_snames_joined, length(L_snames_3), replace = F)
 
   info <- get("info")
 
