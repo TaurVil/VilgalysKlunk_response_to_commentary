@@ -49,31 +49,31 @@ paste(info_exon$chr,info_exon$pos,sep="_") -> info_exon$site
 
 ######## get sample names per population and time point ########
 L_snames_1 <- unique(c(
-  read.delim(paste("./DATA/SampleNames/keep_london_pre_exon",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_london_pre_gwas",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_london_pre_neutral",sep=""), header=F)$V1
+  read.delim(paste("../DATA/SampleNames/keep_london_pre_exon",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_london_pre_gwas",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_london_pre_neutral",sep=""), header=F)$V1
 ))
 L_snames_2 <- unique(c(
-  read.delim(paste("./DATA/SampleNames/keep_london_during_exon",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_london_during_gwas",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_london_during_neutral",sep=""), header=F)$V1
+  read.delim(paste("../DATA/SampleNames/keep_london_during_exon",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_london_during_gwas",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_london_during_neutral",sep=""), header=F)$V1
 ))
 L_snames_3 <- unique(c(
-  read.delim(paste("./DATA/SampleNames/keep_london_post_exon",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_london_post_gwas",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_london_post_neutral",sep=""), header=F)$V1
+  read.delim(paste("../DATA/SampleNames/keep_london_post_exon",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_london_post_gwas",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_london_post_neutral",sep=""), header=F)$V1
 ))
 L_snames_joined <- c(L_snames_1, L_snames_2, L_snames_3)
 # same for denmark
 D_snames_1 <- unique(c(
-  read.delim(paste("./DATA/SampleNames/keep_denmark_pre_exon",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_denmark_pre_gwas",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_denmark_pre_neutral",sep=""), header=F)$V1
+  read.delim(paste("../DATA/SampleNames/keep_denmark_pre_exon",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_denmark_pre_gwas",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_denmark_pre_neutral",sep=""), header=F)$V1
 ))
 D_snames_3 <- unique(c(
-  read.delim(paste("./DATA/SampleNames/keep_denmark_post_exon",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_denmark_post_gwas",sep=""), header=F)$V1, 
-  read.delim(paste("./DATA/SampleNames/keep_denmark_post_neutral",sep=""), header=F)$V1
+  read.delim(paste("../DATA/SampleNames/keep_denmark_post_exon",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_denmark_post_gwas",sep=""), header=F)$V1, 
+  read.delim(paste("../DATA/SampleNames/keep_denmark_post_neutral",sep=""), header=F)$V1
 ))
 D_snames_joined <- c(D_snames_1, D_snames_3)
 ######## PERMUTATION STEP -- EMPTY FOR THIS SCRIPT WITH THE OBSERVED DATA ########
@@ -98,9 +98,9 @@ for (type in c("gwas", "neut", "exon")) {
     DATA <- as.data.frame(matrix(nrow=nrow(get(paste0("info_",type))), ncol=1))
     for (time in times) {
       # read in sample names 
-      tmp_names=read.delim(paste("./DATA/SampleNames/", pop, "_", time, "_",type2,".012.indv",sep=""), header=F)
+      tmp_names=read.delim(paste("../DATA/SampleNames/", pop, "_", time, "_",type2,".012.indv",sep=""), header=F)
       # get genolik file 
-      d <- as.data.frame(fread(paste("./DATA/genoliks/genolik.",type2,"_",pop,"_", time, ".genolik",sep="")))
+      d <- as.data.frame(fread(paste("../DATA/genoliks/genolik.",type2,"_",pop,"_", time, ".genolik",sep="")))
       # remove site. change missing data to NA. get number of samples (tmp_n).
       row.names(d) <- paste(d[,1], d[,2], sep="_"); d <- d[,-(1:2)] ; d[d == -1] <- NA; tmp_n <- ncol(d)/3
       # remove samples missing too much data
@@ -206,13 +206,15 @@ info$delta_D13.ML <- info$denmark.post.alternate.ML-info$denmark.pre.alternate.M
 # zcat ncbi.renamedchrs.vcf.gz | grep -v '^#' | grep '1000Genomes' | awk -F "\t" -v OFS="\t" '{print $1, $2, $2, $3, $4, $5}' > ncbi_1000G.bed
 # bedtools intersect -a ncbi_1000G.bed -b targetted_regions.bed -wa -wb > captured.ncbi1k_rsid.txt
 
-rsid <- fread("./DATA/captured.ncbi1k_rsid.txt")
+rsid <- fread("../DATA/captured.ncbi1k_rsid.txt")
 rsid <- rsid[!duplicated(paste(rsid$V3, rsid$V1, rsid$V4, sep="_")),]
 rsid$site <- paste(rsid$V1, "_", rsid$V3, sep="")
 colnames(rsid)[1:6] <- c("chr", "pos", "pos2", "rsid", "ref", "alt")  # columns 7-9 carry the targeted regions and don't matter. 
 
 info$rsid <- info$rsid_number <- NA
 info$rsid_number <- as.numeric(info$rsid_number)
+rsid <- as.data.frame(rsid)
+
 # info$rsid <- as.character(info$rsid)
 for (i in 1:nrow(info)) {
   # get rsid at that site (i.e., same start site)
@@ -242,7 +244,7 @@ for (i in 1:nrow(info)) {
 
 # sites only filtered for 10 individuals and known rsID. No maf filter. 
 info <- info[info$rsid_number == 1,]
-save.image("./DATA/fst_estimates.RData")
+save.image("../DATA/fst_estimates.RData")
 
 
 # Plot correlation between ML (new) and GL (original) genotype calls. 
@@ -252,4 +254,4 @@ summary(lm(info$alternate.ML ~ info$alternate.GL))
 
 # Get list of sites to keep for permutations
 info2 <- info[info$maf.ML >= 0.05,]
-write.table(info2$site, "./DATA/sites_maf_to_permute.txt", row.names=F, col.names=F, sep="\t", quote=F)
+write.table(info2$site, "../DATA/sites_maf_to_permute.txt", row.names=F, col.names=F, sep="\t", quote=F)

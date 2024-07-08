@@ -1,5 +1,5 @@
 library(data.table); library(ggplot2); library(patchwork)
-load("./DATA/fst_estimates.RData")
+load("../DATA/fst_estimates.RData")
 n_nearby <- 200; min_maf <- 0.05
 
 ######## 

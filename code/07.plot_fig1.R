@@ -3,7 +3,13 @@ library(ggplot2); library(patchwork)
 cbPalette <- c("#999999", "#D55E00", "#CC79A7", "#56B4E9", "#0072B2")
 
 ########  Enrichment for original data ######## 
-load("./DATA/pvalues_200neutralsites.RData")
+load("../DATA/pvalues.n_neutral_250.max_low_freq_pops_1.RData")
+
+info[info$rsid == "rs2549794",]
+
+table(info$type[info$L13.pval.ML <= 0.05 & info$D13.pval.ML <= 0.1 & sign(info$delta_L13.ML) == sign(info$delta_D13.ML) & sign(info$delta_L13.ML) != sign(info$delta_L12.ML)])
+info$rsid[info$L13.pval.ML <= 0.05 & info$D13.pval.ML <= 0.1 & sign(info$delta_L13.ML) == sign(info$delta_D13.ML) & sign(info$delta_L13.ML) != sign(info$delta_L12.ML)]
+
 method="ML"
 # exclude neutral sites
 info_candidate <- info[!info$type == "neut",]
@@ -30,6 +36,14 @@ for (tmp_enrich in c(0.005, seq(0.01,0.1,0.01), seq(0.1,0.2,0.05))) {
 }; rm(tmp_enrich)
 res$maf_bin <- paste(100*res$maf_low, "% to ", 100*res$maf_high, "%", sep="")
 res$fc <- log2(res$observed/res$expected)
+
+log2(sum(res$observed[res$enrichment == 0.01 & res$population == "L13"])/sum(res$expected[res$enrichment == 0.01 & res$population == "L13"]))
+binom.test(sum(res$observed[res$enrichment == 0.01 & res$population == "L13"]), n = sum(res$expected[res$enrichment == 0.01 & res$population == "L13"])*100, p=0.01)$p.value
+
+log2(sum(res$observed[res$enrichment == 0.01 & res$population == "D13"])/sum(res$expected[res$enrichment == 0.01 & res$population == "D13"]))
+binom.test(sum(res$observed[res$enrichment == 0.01 & res$population == "D13"]), n = sum(res$expected[res$enrichment == 0.01 & res$population == "D13"])*100, p=0.01)$p.value
+
+
 ######### plot panel 1A #########
 p1A <- ggplot(res[res$population == "L13",], aes(x=1-enrichment , y=fc, color=maf_bin)) +
   geom_point(size=2) + geom_line() +
@@ -41,11 +55,11 @@ rm(info, res, tmp_bins, method, info_neutral, info_candidate)
 ######## 
 
 ######### read in enrichment results for real data and for permuting sites #########
-load("./DATA/perm_sites_results.RData")
+load("../DATA/perm_sites_results.RData")
 ######### 
 
 ######### calculate enrichment statistics for subsampled data #########
-load("./DATA/pvalues_200neutralsites_subsampled.RData")
+load("../DATA/pvalues.subsampled.n_neutral_250.max_low_freq_pops_1.RData")
 rm(calc_pval_D13, calc_pval_L12, calc_pval_L13, site, design, design2, input_fst, input_maf, drop_samples_missing, n_less, info_neut)
 info <- info[!info$type == "neut",]
 res_subsample <- res_real; res_subsample[,3:8] <- NA

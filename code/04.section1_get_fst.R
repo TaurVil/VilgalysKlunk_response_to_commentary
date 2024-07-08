@@ -79,9 +79,10 @@ D_snames_1p <- sample(D_snames_joined, length(D_snames_1),replace = F)
 D_snames_3p <- D_snames_joined[! D_snames_joined %in% D_snames_1p]
 
 L_snames_1p <- sample(L_snames_joined, length(L_snames_1),replace = F)
-L_left <- L_snames_joined[L_snames_joined ! %in% L_snames_1p]
-L_snames_2p <- sample(L_left, length(L_snames_joined),replace = F)
+L_left <- L_snames_joined[which(!L_snames_joined %in% L_snames_1p)]
+L_snames_2p <- sample(L_left, length(L_snames_2),replace = F)
 L_snames_3p <- L_left[!L_left %in% L_snames_2p]
+rm(L_left)
 
 
 # Convert new list of names to L_snames_[1:3] and D_snames_[1:2]
@@ -210,17 +211,47 @@ info$delta_L13.ML <- info$london.post.alternate.ML-info$london.pre.alternate.ML
 info$delta_L12.ML <- info$london.during.alternate.ML-info$london.pre.alternate.ML
 info$delta_D13.ML <- info$denmark.post.alternate.ML-info$denmark.pre.alternate.ML
 ########
-rm(tmp_names, estimate_af_ml, likelihood)
+#rm(tmp_names, estimate_af_ml, likelihood)
+
+rsid <- fread("./DATA/captured.ncbi1k_rsid.txt")
+rsid <- rsid[!duplicated(paste(rsid$V3, rsid$V1, rsid$V4, sep="_")),]
+rsid$site <- paste(rsid$V1, "_", rsid$V3, sep="")
+colnames(rsid)[1:6] <- c("chr", "pos", "pos2", "rsid", "ref", "alt")  # columns 7-9 carry the targeted regions and don't matter. 
+
+info$rsid <- info$rsid_number <- NA
+info$rsid_number <- as.numeric(info$rsid_number)
+rsid <- as.data.frame(rsid)
 
 
-### FILTER FOR PRESET SITES
-targets <- read.delim("./DATA/sites_for_genotyping.txt", header=F)
-colnames(targets) <- c("chr", "loc", "ref", "alt")
-targets$site <- paste(targets$chr, targets$loc, sep="_")
-info <- info[info$site %in% targets$site,]
-rm(targets)
+
+# info$rsid <- as.character(info$rsid)
+for (i in 1:nrow(info)) {
+  # get rsid at that site (i.e., same start site)
+  tmp <- rsid[rsid$site == info$site[i],]
+  # get rsid that say the same reference allele
+  if (nrow(tmp) > 0) {
+    tmp <- tmp[tmp$ref == info$ref[i],]
+  }
+  # get rsid with the same alternate allele
+  if (nrow(tmp) > 0) {
+    # using strsplit is necessary rather than 'like' to prevent partial matches. Like would allow "C" to match "ACG" like it matches "A,C"
+    keep <- NULL; for (j in 1:nrow(tmp)) {
+      tmp2 <- strsplit(tmp$alt[j],",")[[1]]
+      if (info$alt[i] %in% tmp2) {keep <- cbind(keep,tmp$rsid[j])}
+    }; rm(j, tmp2)
+
+    length(keep) -> info$rsid_number[i]
+    tmp <- tmp[tmp$rsid %in% keep,]
+  }
+  if (nrow(tmp) > 0) {
+    info$rsid[i] <- paste(as.character(tmp$rsid), collapse=", ")
+  }
+  if (i/1000 == round(i/1000)) {print(i)}
+}; rm(keep, rsid, tmp, tmp_n,i)
+########
 
 write.table(info, "./permuted_fst/ITERATION.txt", row.names=F, col.names=T, sep="\t", quote=F)
 
 # sites only filtered for 10 individuals and maf > 2.5%
 save.image("./perms/permuted_ITERATION/fst.RData")
+

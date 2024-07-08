@@ -1,6 +1,9 @@
 library(data.table); library(ggplot2); library(patchwork)
-load("./DATA/fst_estimates_subsampled.RData")
-n_nearby <- 200; min_maf <- 0.05; rsid_status <- 'keep_good_only'
+load("../DATA/fst_estimates_subsampled.RData")
+n_nearby <- 250; min_maf <- 0.05; rsid_status <- 'keep_good_only'; num_lowfreq = 1
+
+info <- as.data.frame(info)
+info <- info[rowSums(info[,which(colnames(info) %like% "alternate.ML")] < 0.01) <= num_lowfreq,]
 info <- info[!is.na(info$maf.ML_same),]
 
 ######## Split off neutral sites, then filter candidates based on minor allele frequency ########
@@ -58,5 +61,6 @@ pvals <- pvals[,-c(2:5)]; colnames(pvals)[2:4] <- paste(colnames(pvals)[2:4],"ML
 info <- merge(pvals, info, by="site"); rm(pvals)
 ########
 
-save.image("./DATA/pvalues_200neutralsites_subsampled.RData")
+# save.image("./DATA/pvalues_250neutralsites_subsampled.RData")
+save.image(paste0("../DATA/pvalues.subsampled.n_neutral_",n_nearby, ".max_low_freq_pops_", num_lowfreq,".RData"))
 

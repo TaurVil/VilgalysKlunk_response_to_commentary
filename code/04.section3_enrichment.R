@@ -11,7 +11,7 @@ info_neutral <- info[info$type == "neut",]
   tmp_bin_breaks <- c(0.1,.2,.3,.4,0.5)
   tmp_bins <-  matrix(ncol=2, nrow=length(tmp_bin_breaks)); tmp_bins[,1] <- c(0,tmp_bin_breaks[-length(tmp_bin_breaks)]); tmp_bins[,2] <- c(tmp_bin_breaks); rm(tmp_bin_breaks)
   res <- NULL
-  for (tmp_enrich in c(0.005, seq(0.01,0.1,0.01), seq(0.1,0.2,0.05))) {
+  for (tmp_enrich in c(0.01)) {
     for (tmp_bin in 1:nrow(tmp_bins)) {
       for (tmp_pop in c("L13", "D13", "L12")) {
         tmp_data <- info_candidate[info_candidate[[paste0("maf.",method)]] > tmp_bins[tmp_bin,1] & info_candidate[[paste0("maf.",method)]] <= tmp_bins[tmp_bin,2],]

@@ -1,4 +1,4 @@
-load("./DATA/fst_estimates_perm_sites.RData")
+load("../DATA/fst_estimates_perm_sites.RData")
 
 # set bins to consider
 tmp_bin_breaks <- c(0.1,.2,.3,.4,0.5)
@@ -44,11 +44,11 @@ for (fff in unique(info_perm_neutral$perm)) {
   
   res_perm <- rbind(res_perm,tmp2); rm(tmp2, tmp, res)
   print(fff)
-}; rm(fff); rm(tmp_enrich, tmp_bins)
+}; rm(fff); rm(tmp_enrich)
 
 
 # add in the real enrichment as well
-info_candidate <- info[info$type != "neut",]
+info_candidate <- info_candidate[info_candidate$type != "neut",]
 res <- NULL
 for (tmp_enrich in c(0.01)) {
   for (tmp_bin in 1:nrow(tmp_bins)) {
@@ -88,4 +88,4 @@ res_real <- tmp2; rm(tmp2, tmp, res)
 rm(x,y,tmp_fst, rsid_status, n_nearby, min_n, min_maf)
 rm(info_candidate, get_perm, info, info_perm_neutral)
 
-save.image("./DATA/perm_sites_results.RData")
+save.image("../DATA/perm_sites_results.RData")

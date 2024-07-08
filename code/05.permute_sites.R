@@ -1,10 +1,14 @@
-library(data.table); library(ggplot2); library(patchwork)
+library(data.table); library(ggplot2); library(patchwork); library(parallel)
 
-n_nearby <- 200; min_maf <- 0.05; rsid_status <- 'keep_good_only'
+n_nearby <- 250; min_maf <- 0.05; rsid_status <- 'keep_good_only'
+num_lowfreq=1
 
 get_perm <- function(fff) {
   
-  load("./DATA/fst_estimates.RData")
+  load("../DATA/fst_estimates.RData")
+  
+  info <- as.data.frame(info)
+  info <- info[rowSums(info[,which(colnames(info) %like% "alternate.ML")] < 0.01) <= num_lowfreq,]
   
   ######## Randomly sample neutral sites, then split them off and filter candidates by MAF ########
   info_neut <- info[sample(size = sum(info$type == "neut"), x = 1:length(info$type), replace = F),]
@@ -65,9 +69,7 @@ get_perm <- function(fff) {
   
   rm(list=ls(pattern="calc_pval_"))
   ########
-  rm(drop_samples_missing, mafs, method, min_neutral_nsites, tmp_n, window_size, design, bins, design2, info_neut)
-  
-  pvals <- pvals[,-c(2:5)]
+  pvals <- pvals[,-c(1:4)]
   colnames(pvals)[2:4] <- paste(colnames(pvals)[2:4],"ML", sep=".")
   info <- merge(pvals, info, by="site")
   rm(pvals)
@@ -75,8 +77,8 @@ get_perm <- function(fff) {
   
   info$perm <- fff
   info$test <- paste0("ML_n",n_nearby)
-  keep <- c(1,5:8,98:ncol(info),which(colnames(info) == "type"),which(colnames(info) %like% "ML"))
-  info <- info[,..keep]
+  keep <- c(1,5:8,68:ncol(info),which(colnames(info) == "type"),which(colnames(info) %like% "ML"))
+  info <- info[,keep]
   info <- info[,c(1:12,21,29,32,35,36:38)]
   rm(keep)
   
@@ -89,15 +91,15 @@ get_perm <- function(fff) {
 set.seed(42)
 library(parallel) # split up so it runs without crashing anything and we have intermediate files saved
 fff <- 1:1000; info_perm_neutral1 <- do.call("rbind", mclapply(fff, get_perm))
-fff <- 1001:2000; info_perm_neutral2 <- do.call("rbind", mclapply(fff, get_perm)); save.image("./DATA/fst_estimates_perm_sites.RData")
+fff <- 1001:2000; info_perm_neutral2 <- do.call("rbind", mclapply(fff, get_perm)); save.image("../DATA/fst_estimates_perm_sites.RData")
 fff <- 2001:3000; info_perm_neutral3 <- do.call("rbind", mclapply(fff, get_perm))
-fff <- 3001:4000; info_perm_neutral4 <- do.call("rbind", mclapply(fff, get_perm)); save.image("./DATA/fst_estimates_perm_sites.RData")
+fff <- 3001:4000; info_perm_neutral4 <- do.call("rbind", mclapply(fff, get_perm)); save.image("../DATA/fst_estimates_perm_sites.RData")
 fff <- 4001:5000; info_perm_neutral5 <- do.call("rbind", mclapply(fff, get_perm))
-fff <- 5001:6000; info_perm_neutral6 <- do.call("rbind", mclapply(fff, get_perm)); save.image("./DATA/fst_estimates_perm_sites.RData")
+fff <- 5001:6000; info_perm_neutral6 <- do.call("rbind", mclapply(fff, get_perm)); save.image("../DATA/fst_estimates_perm_sites.RData")
 fff <- 6001:7000; info_perm_neutral7 <- do.call("rbind", mclapply(fff, get_perm))
-fff <- 7001:8000; info_perm_neutral8 <- do.call("rbind", mclapply(fff, get_perm)); save.image("./DATA/fst_estimates_perm_sites.RData")
+fff <- 7001:8000; info_perm_neutral8 <- do.call("rbind", mclapply(fff, get_perm)); save.image("../DATA/fst_estimates_perm_sites.RData")
 fff <- 8001:9000; info_perm_neutral9 <- do.call("rbind", mclapply(fff, get_perm))
-fff <- 9001:10000; info_perm_neutral10 <- do.call("rbind", mclapply(fff, get_perm)); save.image("./DATA/fst_estimates_perm_sites.RData")
+fff <- 9001:10000; info_perm_neutral10 <- do.call("rbind", mclapply(fff, get_perm)); save.image("../DATA/fst_estimates_perm_sites.RData")
 rm(fff)
 
 info_perm_neutral <- rbind(info_perm_neutral1, info_perm_neutral2, info_perm_neutral3, info_perm_neutral4, info_perm_neutral5, 
@@ -105,4 +107,4 @@ info_perm_neutral <- rbind(info_perm_neutral1, info_perm_neutral2, info_perm_neu
 rm(info_perm_neutral1, info_perm_neutral2, info_perm_neutral3, info_perm_neutral4, info_perm_neutral5, 
    info_perm_neutral6, info_perm_neutral7, info_perm_neutral8, info_perm_neutral9, info_perm_neutral10)
 
-save.image("./DATA/fst_estimates_perm_sites.RData")
+save.image("../DATA/fst_estimates_perm_sites.RData")

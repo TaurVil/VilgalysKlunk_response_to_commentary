@@ -2,7 +2,16 @@
 library(data.table); library(ggplot2); library(patchwork)
 
 load("./perms/permuted_ITERATION/fst.RData")
-n_nearby <- 200; min_maf <- 0.05; rsid_status <- 'keep_good_only'
+n_nearby=250 # number of neutral loci to compare candidates against
+num_lowfreq=1 # maximum number of population-time points which we'll allow to not observe the alternate allele
+min_maf <- 0.05
+rsid_status <- 'keep_good_only'
+
+
+info <- as.data.frame(info)
+info <- info[rowSums(info[,which(colnames(info) %like% "alternate.ML")] < 0.01) <= num_lowfreq,]
+
+
 
 ######## Split off neutral sites, then filter candidates based on minor allele frequency ########
 info_neut <- info[info$type == "neut",]; info_neut$maf_rank <- rank(info_neut$maf.ML)
@@ -60,3 +69,4 @@ info <- merge(pvals, info, by="site"); rm(pvals)
 ########
 
 save.image("./perms/permuted_ITERATION/pvals.RData")
+
