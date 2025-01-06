@@ -71,12 +71,12 @@ save.image("./cfu_results.RData")
 
 ## ERAP2 results 
 
-res[res$snp == "chr5_96235896",]
-res[res$snp == "chr5_96244549",]
+res_cfu[res_cfu$snp == "chr5_96235896",]
+res_cfu[res_cfu$snp == "chr5_96244549",]
 
-sum(res$pval <= res$pval[res$snp == "chr5_96235896"]) #
-sum(res$pval <= res$pval[res$snp == "chr5_96235896"])/nrow(res)
+sum(res_cfu$pval <= res_cfu$pval[res_cfu$snp == "chr5_96235896"]) #
+sum(res_cfu$pval <= res_cfu$pval[res_cfu$snp == "chr5_96235896"])/nrow(res_cfu)
 
-# original value which is without dropping one sample with failed genotype data
-sum(res$pval <= 0.0155) # 
-sum(res$pval <= 0.0155)/nrow(res)
+# original value which is without dropping one sample with failed genome-wide genotype data
+sum(res_cfu$pval <= 0.0155) # 
+sum(res_cfu$pval <= 0.0155)/nrow(res_cfu)

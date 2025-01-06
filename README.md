@@ -8,7 +8,7 @@ First, we will get allele frequencies and Fst values for each site, using the ML
 
 ```console
 01_get_fst_ML.R # calculate fst
-02_get_pvals.R # identify outliers by the proportion of 200 maf-matched SNPs their fst level exceeds
+02_get_pvals.R # identify outliers by the proportion of 250 maf-matched SNPs their fst level exceeds
 ```
 
 Second, we will consider the dataset subsampled such that the mean coverage is the same between the neutral, immune GWAS, and immune exon enrichments. 
@@ -66,6 +66,6 @@ sbatch --array=1-2264 --mem=4G 12.get_all_perms.sh
 15.bootstrap_ERAP_loci.R
 
 # Plot Figure 2
-panel2A <- readRDS("./fig2a.RData") # print as 8x9"
+panel2A <- readRDS("./fig2a_revision.RData") # print as 8x9"
 load("./bootstrap_ERAP_loci.RData") # print plot_erap_loci as 4x9"
 ```
