@@ -3,7 +3,7 @@ library(ggplot2); library(patchwork)
 cbPalette <- c("#999999", "#D55E00", "#CC79A7", "#56B4E9", "#0072B2")
 
 ########  Enrichment for original data ######## 
-load("../DATA/pvalues.n_neutral_250.max_low_freq_pops_1.RData")
+load("../DATA/pvalues.n_neutral_300.max_low_freq_pops_1.RData")
 
 info[info$rsid == "rs2549794",]
 
@@ -44,8 +44,10 @@ log2(sum(res$observed[res$enrichment == 0.01 & res$population == "D13"])/sum(res
 binom.test(sum(res$observed[res$enrichment == 0.01 & res$population == "D13"]), n = sum(res$expected[res$enrichment == 0.01 & res$population == "D13"])*100, p=0.01)$p.value
 
 
+res -> res_real
+
 ######### plot panel 1A #########
-p1A <- ggplot(res[res$population == "L13",], aes(x=1-enrichment , y=fc, color=maf_bin)) +
+p1A <- ggplot(res_real[res_real$population == "L13",], aes(x=1-enrichment , y=fc, color=maf_bin)) +
   geom_point(size=2) + geom_line() +
   theme_classic() + ylab("log2(enrichment)") +
   ggtitle("London: pre vs post") + coord_cartesian(xlim=c(0.8,1), ylim=c(-0.5,4.2)) +
@@ -59,16 +61,19 @@ load("../DATA/perm_sites_results.RData")
 ######### 
 
 ######### calculate enrichment statistics for subsampled data #########
-load("../DATA/pvalues.subsampled.n_neutral_250.max_low_freq_pops_1.RData")
+load("../DATA/pvalues_200neutralsites_subsampled.RData")
 rm(calc_pval_D13, calc_pval_L12, calc_pval_L13, site, design, design2, input_fst, input_maf, drop_samples_missing, n_less, info_neut)
 info <- info[!info$type == "neut",]
-res_subsample <- res_real; res_subsample[,3:8] <- NA
+res_subsample <- res_real[1,]; res_subsample[,3:8] <- NA
 
 percentile=0.01
 res_subsample$fc_L13 <- sum(info$L13.pval.ML_same <= percentile)/(length(info$L13.pval.ML_same)*percentile)
 res_subsample$fc_D13 <- sum(info$D13.pval.ML_same <= percentile)/(length(info$D13.pval.ML_same)*percentile)
 res_subsample$p_L13 <- binom.test(sum(info$L13.pval.ML_same <= percentile), n = length(info$L13.pval.ML_same), p=percentile)$p.value
 res_subsample$p_D13 <- binom.test(sum(info$D13.pval.ML_same <= percentile), n = length(info$D13.pval.ML_same), p=percentile)$p.value
+
+res_subsample
+
 rm(percentile, info)
 ######### lollipop plot for 1B #########
 res_real$method <- "original"
