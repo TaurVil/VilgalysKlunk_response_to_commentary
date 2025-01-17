@@ -3,7 +3,7 @@ library(ggplot2); library(patchwork)
 cbPalette <- c("#999999", "#D55E00", "#CC79A7", "#56B4E9", "#0072B2")
 
 ########  Enrichment for original data ######## 
-load("../DATA/pvalues.n_neutral_300.max_low_freq_pops_1.RData")
+load("../DATA/pvalues.n_neutral_200.max_low_freq_pops_1.RData")
 
 info[info$rsid == "rs2549794",]
 
