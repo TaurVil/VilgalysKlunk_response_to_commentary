@@ -1,0 +1,26 @@
+
+*.genolik
+*.frq
+*.genolik
+*.indv
+*.RData
+*.Rhistory
+
+DATA/SampleNames/keep_*
+DATA/fst_estimates_*
+DATA/sites_maf_*
+
+unassigned_bit_final_stages_pvalue_prep_for_tableS1.R
+DATA/perm_res.range.txt
+DATA/perm_res.txt
+DATA/captured.ncbi1k_rsid.txt
+DATA/permuted_enrichment_results_revision.txt
+DATA/real_enrichments_3_methods.txt
+DATA/desktop.ini
+code/revision_permutation_vs_binomial_permutations/pvalues.permutation_vs_binomial.R
+code/Dead_Ends/
+code/revision01*
+code/compare_with_original_results.R
+code/revision02d.Mathieson_vs_Our_enrichment_discrepancy_analyses.R
+code/13b.looking at pvalues.R
+

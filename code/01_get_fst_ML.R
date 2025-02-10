@@ -87,11 +87,16 @@ rm(L_snames_joined, D_snames_joined)
 # No filtering at this point
 for (type in c("gwas", "neut", "exon")) {
   # Deal with discrepancy in intermediate file names
-  if (type == "exon") {type2 <- "exons"};   if (type == "gwas") {type2 <- "gwas"};   if (type == "neut") {type2 <- "neutral"}
+  if (type == "exon") {type2 <- "exons"}
+  if (type == "gwas") {type2 <- "gwas"}
+  if (type == "neut") {type2 <- "neutral"}
   
   for (pop in c("london", "denmark")) {
-    if (pop == "london") {pop2 <- "L"}; if (pop == "denmark") {pop2 <- "D"}
-    if (pop == "london") {times <- c("pre", "post", "during")}; if (pop == "denmark") {times <- c("pre", "post")}
+    if (pop == "london") {pop2 <- "L"}
+    if (pop == "denmark") {pop2 <- "D"}
+
+    if (pop == "london") {times <- c("pre", "post", "during")}
+    if (pop == "denmark") {times <- c("pre", "post")}
     
     # create DATA, a p sites by 3*n samples matrix of genotype likelihoods, and the corresponding list of sample names 
     NAMES <- NULL
@@ -105,7 +110,10 @@ for (type in c("gwas", "neut", "exon")) {
       row.names(d) <- paste(d[,1], d[,2], sep="_"); d <- d[,-(1:2)] ; d[d == -1] <- NA; tmp_n <- ncol(d)/3
       # remove samples missing too much data
       tmp_missing=(colSums(is.na(d))/nrow(d))[seq(1,3*tmp_n,3)]
-      keep <- which(tmp_missing <= drop_samples_missing); k2 <- as.data.frame(matrix(nrow=nrow(d), ncol=1)); for (k in keep) {k2 <- cbind(k2, d[,(k*3-2):(k*3)])}; d <- k2[,-1];
+      keep <- which(tmp_missing <= drop_samples_missing)
+      k2 <- as.data.frame(matrix(nrow=nrow(d), ncol=1))
+      for (k in keep) {k2 <- cbind(k2, d[,(k*3-2):(k*3)])}
+      d <- k2[,-1]
       tmp_names <- tmp_names$V1[keep]; n_pre <- ncol(d)/3
       
       # SAVE TO FILE FOR pop and type 
@@ -119,11 +127,16 @@ for (type in c("gwas", "neut", "exon")) {
     # estimate allele frequencies for each time point, based on their assignments given above ([L,D]_snames_[1:3], which can be permuted)
     info <- get(paste0("info_", type))
     for (time in times) {
-      if (time == "pre") {t2 <- "1"}; if (time == "during") {t2 <- "2"}; if (time == "post") {t2 <- "3"}
+      if (time == "pre") {t2 <- "1"}
+      if (time == "during") {t2 <- "2"}
+      if (time == "post") {t2 <- "3"}
       # keep individuals given by "[L,D]_snames_[1:3]"
-      keep <- get(paste0(pop2, "_snames_", t2)); keep <- which(NAMES %in% keep)
+      keep <- get(paste0(pop2, "_snames_", t2))
+      keep <- which(NAMES %in% keep)
       # get data for just those individuals
-      k2 <- as.data.frame(matrix(nrow=nrow(DATA), ncol=1)); for (k in keep) {k2 <- cbind(k2, DATA[,(k*3-2):(k*3)])}; tmp_data <- k2[,-1]; rm(k, keep, k2)
+      k2 <- as.data.frame(matrix(nrow=nrow(DATA), ncol=1))
+      for (k in keep) {k2 <- cbind(k2, DATA[,(k*3-2):(k*3)])}
+      tmp_data <- k2[,-1]; rm(k, keep, k2)
       n <- ncol(tmp_data)/3
       
       # save number of samples called and the genotype likelihoods
@@ -146,7 +159,7 @@ rm(info_gwas, info_exon, info_neut)
 info <- info[!duplicated(info$site),]
 ########  
 
-####### filter for sites with 10 samples per population in each time point #######
+####### filter for sites with `min_n` samples per population in each time point #######
 attach(info)
 info <- subset(info, apply(X = cbind(london.during.called, london.pre.called, london.post.called, denmark.pre.called, denmark.post.called), 1, min) >= min_n)
 detach(info)
@@ -241,11 +254,9 @@ for (i in 1:nrow(info)) {
 }; rm(keep, rsid, tmp, tmp_n,i)
 ########
 
-
 # sites only filtered for 10 individuals and known rsID. No maf filter. 
 info <- info[info$rsid_number == 1,]
 save.image("../DATA/fst_estimates.RData")
-
 
 # Plot correlation between ML (new) and GL (original) genotype calls. 
 # Then get summary stats
@@ -255,3 +266,13 @@ summary(lm(info$alternate.ML ~ info$alternate.GL))
 # Get list of sites to keep for permutations
 info2 <- info[info$maf.ML >= 0.05,]
 write.table(info2$site, "../DATA/sites_maf_to_permute.txt", row.names=F, col.names=F, sep="\t", quote=F)
+# now write sites for ANGSD
+# sites <- paste0(d$chr, ":", d$pos, "-", d$pos)
+# write.table(sites, "~/sites_maf_to_analyze.txt", row.names=F, col.names=F, sep="\t", quote=F)
+# write.table(d$rsid_1KG, "~/sites_maf_to_analyze.rsids.txt", row.names=F, col.names=F, sep="\t", quote=F)
+
+# Get data for estimating selection coefficients (given to Mattias)
+write.table(info[,c(68,1:5,21,28:29,24:25,6:20)], "../DATA/sites_and_frequencies.2023_March.txt", row.names=F, col.names=T, sep="\t", quote=F)
+
+
+

@@ -1,8 +1,9 @@
 library(data.table); library(ggplot2)
 
-load("./20Feb2022_all3_estimates_no_pvalues.RData")
-rm(method, min_maf, min_n, min_neutral_nsites, tmp_n, window_size, drop_samples_missing, mafs, bins, design2)
+load("../DATA/fst_estimates.RData") #/20Feb2022_all3_estimates_no_pvalues.RData")
+rm(min_maf, min_n, drop_samples_missing, design2)
 
+nboots=1000
 sites <- c("chr5_96244549", "chr5_96244585")
 
 likelihood <- function(p, data){
@@ -28,7 +29,7 @@ info <- info[info$site %in% sites,]
 
 plot_info <- NULL
 for (ttt in c(4:nrow(design),1:3)) {
-  name=paste("./DATA/genoliks/genolik.gwas_",design$pop[ttt],"_", design$time[ttt],".genolik",sep="")
+  name=paste("../DATA/genoliks/genolik.gwas_",design$pop[ttt],"_", design$time[ttt],".genolik",sep="")
   n2=paste(design$pop[ttt],design$time[ttt],sep="_")
   d <- as.data.frame(fread(name))
   row.names(d) <- paste(d$V1, d$V2, sep="_")
@@ -38,7 +39,7 @@ for (ttt in c(4:nrow(design),1:3)) {
   
   #### bootstrap step 
   boot_data <- NULL
-  for (i in 1:10000) {
+  for (i in 1:nboots) {
     k <- sample(1:n, n, replace=T)
     new_d <- as.data.frame(matrix(ncol=1, nrow=nrow(d)))
     for (j in k) {
@@ -68,12 +69,9 @@ for (ttt in c(4:nrow(design),1:3)) {
   print(design[ttt,])
   
   rbind(plot_info, tmp_info) -> plot_info
-  
   rm(n, n2, name, tmp_info, boot_data, boot_info)
   
-}
-
-rm(ttt)
+}; rm(ttt)
 
 plot_info$time <- factor(plot_info$time, levels=c("pre", "during", "post"))
 plot_info$xpos <- as.numeric(plot_info$time)
@@ -100,4 +98,4 @@ rm(estimate_af_ml, likelihood, design)
 info -> erap_info
 plot_info -> erap_plot_info; rm(plot_info, info)
 sites -> erap_sites; rm(sites)
-save.image("./bootstrap_ERAP_loci.RData")
+# save.image("./bootstrap_ERAP_loci.RData")
